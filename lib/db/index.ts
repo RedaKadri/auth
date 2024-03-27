@@ -1,9 +1,8 @@
-import { DrizzleMySQLAdapter } from '@lucia-auth/adapter-drizzle';
-
 import mysql from 'mysql2/promise';
-import { drizzle } from 'drizzle-orm/mysql2';
+import { MySql2Database, drizzle } from 'drizzle-orm/mysql2';
+import * as schema from './schema';
 
-const connection = mysql.createPool({
+const pool = mysql.createPool({
 	host: '127.0.0.1',
 	port: 3306,
 	user: 'root',
@@ -11,6 +10,5 @@ const connection = mysql.createPool({
 	database: 'nextdemo',
 });
 
-const db = drizzle(connection, { mode: 'default' });
-
+const db: MySql2Database<typeof schema> = drizzle(pool, { mode: 'default', schema });
 export default db;

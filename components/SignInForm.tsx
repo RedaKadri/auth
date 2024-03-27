@@ -7,23 +7,23 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { SignUpSchema } from '@/types';
-import { signUp } from '@/action/auth.action';
+import { SignInSchema } from '@/types';
+import { signIn } from '@/action/auth.action';
 import { toast } from './ui/use-toast';
 import { useRouter } from 'next/navigation';
 
-const SignUpForm = () => {
+const SignInForm = () => {
 	const router = useRouter();
 
-	const form = useForm<z.infer<typeof SignUpSchema>>({
-		resolver: zodResolver(SignUpSchema),
+	const form = useForm<z.infer<typeof SignInSchema>>({
+		resolver: zodResolver(SignInSchema),
 		defaultValues: {
 			username: '',
 		},
 	});
 
-	async function onSubmit(values: z.infer<typeof SignUpSchema>) {
-		const res = await signUp(values);
+	async function onSubmit(values: z.infer<typeof SignInSchema>) {
+		const res = await signIn(values);
 		if (res.error) {
 			toast({
 				title: 'Error',
@@ -34,7 +34,7 @@ const SignUpForm = () => {
 		if (res.success) {
 			toast({
 				title: 'Success',
-				description: 'Signed up successfully',
+				description: 'Welcome back',
 			});
 			router.push('/');
 		}
@@ -69,23 +69,10 @@ const SignUpForm = () => {
 						</FormItem>
 					)}
 				/>
-				<FormField
-					control={form.control}
-					name='confirmPassword'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Confirm Password</FormLabel>
-							<FormControl>
-								<Input placeholder='*****' type='password' {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
 				<Button type='submit'>Submit</Button>
 			</form>
 		</Form>
 	);
 };
 
-export default SignUpForm;
+export default SignInForm;

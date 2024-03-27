@@ -7,6 +7,8 @@ import db from '@/lib/db';
 import { userTable } from '@/lib/db/schema';
 import { lucia } from '@/lib/auth';
 import { Argon2id } from 'oslo/password';
+import { eq } from 'drizzle-orm';
+import { redirect } from 'next/navigation';
 
 export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
 	const hashPassword = await new Argon2id().hash(values.password);
@@ -38,4 +40,50 @@ export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
 			error: error?.message,
 		};
 	}
+};
+
+export const signIn = async (values: z.infer<typeof SignInSchema>) => {
+	try {
+		SignInSchema.parse(values);
+	} catch (error: any) {
+		return {
+			error: error.message,
+		};
+	}
+
+	const existingUser = await db.query.userTable.findFirst({
+		where: (table) => eq(table.username, values.username),
+	});
+
+	if (!existingUser) {
+		return {
+			error: 'User not found',
+		};
+	}
+
+	if (!existingUser.hashPassword) {
+		return {
+			error: 'User not found',
+		};
+	}
+
+	const isValidPassword = await new Argon2id().verify(existingUser.hashPassword, values.password);
+
+	if (!isValidPassword) {
+		return {
+			error: 'Incorrect username or password',
+		};
+	}
+
+	const session = await lucia.createSession(existingUser.id, {
+		expiresIn: 60 * 60 * 24 * 30,
+	});
+
+	const sessionCookie = lucia.createSessionCookie(session.id);
+
+	cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+
+	return {
+		success: 'Logged in successfully',
+	};
 };

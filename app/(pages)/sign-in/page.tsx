@@ -1,4 +1,4 @@
-import SignUpForm from '@/components/SignUpForm';
+import SignInForm from '@/components/SignInForm';
 import { validateRequest } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
@@ -18,8 +18,8 @@ export default async function SignUpPage() {
 				<h2 className='text-2xl font-bold'>RK Group</h2>
 			</a>
 			<div className='w-full max-w-xl space-y-8 rounded-lg bg-white p-6 shadow dark:bg-gray-800 sm:p-8'>
-				<h2 className='text-2xl font-bold text-gray-900 dark:text-white'>Sign Up</h2>
-				<SignUpForm />
+				<h2 className='text-2xl font-bold text-gray-900 dark:text-white'>Sign In</h2>
+				<SignInForm />
 			</div>
 		</div>
 	);
